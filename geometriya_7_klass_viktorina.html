@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Геометрический турнир — 7 класс</title>
+<style>
+:root{--navy:#173b70;--blue:#2684db;--gold:#ffd66b;--bg:#f3f7fc;--ink:#17243a}
+*{box-sizing:border-box}body{margin:0;font-family:Arial, sans-serif;background:linear-gradient(135deg,#eaf3ff,#f8f5ff);color:var(--ink);min-height:100vh;padding:22px}
+main{max-width:760px;margin:0 auto}.hero{background:linear-gradient(130deg,#173b70,#2465a8);color:white;border-radius:20px;padding:28px 22px;text-align:center;box-shadow:0 12px 30px #173b7025}
+h1{font-size:clamp(24px,5vw,36px);margin:0 0 10px}.topic{font-size:clamp(18px,4vw,23px);color:var(--gold);font-weight:bold}.meta{margin-top:15px;font-size:14px;opacity:.9}
+.card{background:white;border-radius:18px;padding:25px;margin-top:20px;box-shadow:0 8px 24px #1c3c6415}
+.topline{display:flex;justify-content:space-between;gap:10px;font-size:14px;color:#52647d}.bar{height:8px;background:#e8eef7;border-radius:20px;margin:14px 0 24px;overflow:hidden}.fill{height:100%;width:0;background:var(--blue);transition:width .25s}
+h2{font-size:clamp(19px,4vw,24px);line-height:1.35;margin:0 0 20px}.answers{display:grid;gap:11px}
+.answer{display:flex;align-items:flex-start;gap:12px;border:2px solid #e2eaf4;border-radius:12px;padding:14px;cursor:pointer;transition:.15s;line-height:1.35}
+.answer:hover{border-color:#8bb9e8;background:#f7fbff}.answer input{margin-top:3px;accent-color:var(--blue);transform:scale(1.15)}.answer.chosen{border-color:var(--blue);background:#eff7ff}
+button{border:0;border-radius:12px;padding:14px 20px;font-size:16px;font-weight:bold;cursor:pointer;background:var(--blue);color:white;width:100%;margin-top:20px}
+button:disabled{opacity:.45;cursor:not-allowed}.feedback{padding:15px;border-radius:12px;background:#f1f5fa;margin-top:18px;line-height:1.5}.good{color:#147344;font-weight:bold}.bad{color:#a35b08;font-weight:bold}
+.footer{display:flex;justify-content:space-between;color:#64748b;font-size:13px;margin-top:16px}.result{text-align:center}.score{font-size:48px;font-weight:bold;color:var(--navy);margin:8px}.trophy{font-size:54px}.small{color:#64748b;font-size:14px;line-height:1.5}
+@media(max-width:520px){body{padding:12px}.card{padding:18px}.hero{padding:23px 15px}}
+</style>
+</head>
+<body>
+<main>
+<header class="hero">
+  <h1>ГЕОМЕТРИЧЕСКИЙ ТУРНИР</h1>
+  <div class="topic">Три признака равенства треугольников</div>
+  <div class="meta">7 класс · Геометрия · 15 вопросов</div>
+</header>
+<section class="card" id="quiz">
+  <div class="topline"><strong id="counter">Вопрос 1 из 15</strong><span id="percent">7%</span></div>
+  <div class="bar"><div class="fill" id="fill"></div></div>
+  <h2 id="question"></h2>
+  <div class="answers" id="answers"></div>
+  <div id="feedback"></div>
+  <button id="action" disabled>Проверить ответ</button>
+  <div class="footer"><span id="points">Правильных ответов: 0</span><span>Максимум: 15 баллов</span></div>
+</section>
+</main>
+<script>
+const questions = [
+{q:"Какой первый признак равенства треугольников?",a:["По трём сторонам","По двум сторонам и углу между ними","По стороне и двум прилежащим углам","По двум углам"],c:1,e:"Первый признак: по двум сторонам и углу между ними."},
+{q:"Какой второй признак равенства треугольников?",a:["По трём сторонам","По двум сторонам","По стороне и двум прилежащим к ней углам","По двум углам"],c:2,e:"Второй признак: по стороне и двум прилежащим к ней углам."},
+{q:"Какой третий признак равенства треугольников?",a:["По трём сторонам","По двум углам","По двум сторонам и углу","По одной стороне"],c:0,e:"Третий признак: по трём сторонам."},
+{q:"В треугольниках ABC и DEF: AB = DE, AC = DF, ∠A = ∠D. Какой признак можно применить?",a:["Первый","Второй","Третий","Ни один"],c:0,e:"Две стороны и угол между ними равны — первый признак."},
+{q:"В двух треугольниках равны одна сторона и два прилежащих к ней угла. Что можно утверждать?",a:["Треугольники подобны","Треугольники равны","Треугольники прямоугольные","Недостаточно данных"],c:1,e:"Это второй признак равенства треугольников."},
+{q:"Стороны первого треугольника равны 3 см, 4 см и 5 см. Стороны второго — 3 см, 4 см и 5 см. Что можно сказать?",a:["Они равны","Они не равны","Они равны только по углам","Нельзя определить"],c:0,e:"Три соответствующие стороны равны — третий признак."},
+{q:"Как называется угол, расположенный между двумя сторонами треугольника?",a:["Прямой угол","Внешний угол","Угол между сторонами","Развёрнутый угол"],c:2,e:"Это угол, образованный двумя рассматриваемыми сторонами."},
+{q:"Если AB = DE, BC = EF и ∠B = ∠E, то треугольники ABC и DEF...",a:["Не равны","Равны по первому признаку","Равны по второму признаку","Равны по третьему признаку"],c:1,e:"Угол B и угол E заключены между равными сторонами."},
+{q:"Какие элементы должны быть равны для применения второго признака?",a:["Две стороны и угол между ними","Три стороны","Сторона и два прилежащих к ней угла","Три угла"],c:2,e:"Для второго признака нужны одна соответствующая сторона и два прилежащих к ней угла."},
+{q:"В равных треугольниках соответствующие стороны...",a:["Всегда параллельны","Равны","Перпендикулярны","Не связаны между собой"],c:1,e:"У равных треугольников все соответствующие стороны и углы равны."},
+{q:"Могут ли два треугольника быть равными, если у них равны только три угла?",a:["Да, всегда","Нет, не обязательно","Только если они прямоугольные","Только если они равнобедренные"],c:1,e:"Равенство трёх углов гарантирует подобие, но не обязательно равенство треугольников."},
+{q:"В треугольниках равны две стороны и угол, НЕ заключённый между ними. Какой вывод верен?",a:["Всегда равны по первому признаку","Всегда равны по второму признаку","Этого недостаточно для применения трёх признаков","Всегда равны по третьему признаку"],c:2,e:"Такое условие само по себе не соответствует ни одному из трёх признаков."},
+{q:"Если AB = AC, то треугольник ABC...",a:["Равносторонний","Равнобедренный","Прямоугольный","Разносторонний"],c:1,e:"Если две стороны треугольника равны, он равнобедренный."},
+{q:"В треугольниках ABC и MNP: AB = MN, ∠A = ∠M, ∠B = ∠N. Какой признак?",a:["Первый","Второй","Третий","Ни один"],c:1,e:"Равны сторона и два прилежащих к ней угла — второй признак."},
+{q:"Для чего нужны признаки равенства треугольников?",a:["Чтобы находить площадь любого треугольника","Чтобы доказывать равенство треугольников по определённым элементам","Чтобы измерять периметр","Чтобы находить только углы"],c:1,e:"Признаки позволяют доказать равенство треугольников, не сравнивая все их элементы."}
+];
+let index=0, selected=null, score=0, checked=false;
+const $=id=>document.getElementById(id);
+function render(){
+ const q=questions[index]; selected=null; checked=false;
+ $("counter").textContent=`Вопрос ${index+1} из ${questions.length}`;
+ $("percent").textContent=`${Math.round((index+1)/questions.length*100)}%`;
+ $("fill").style.width=`${(index+1)/questions.length*100}%`;
+ $("question").textContent=q.q; $("feedback").innerHTML="";
+ $("answers").innerHTML="";
+ q.a.forEach((answer,i)=>{
+  const label=document.createElement("label"); label.className="answer";
+  const radio=document.createElement("input");radio.type="radio";radio.name="answer";radio.value=i;
+  radio.addEventListener("change",()=>{selected=i;document.querySelectorAll(".answer").forEach(x=>x.classList.remove("chosen"));label.classList.add("chosen");$("action").disabled=false;});
+  const span=document.createElement("span");span.textContent=String.fromCharCode(1040+i)+". "+answer;
+  label.append(radio,span);$("answers").append(label);
+ });
+ $("action").disabled=true;$("action").textContent="Проверить ответ";
+ $("points").textContent=`Правильных ответов: ${score}`;
+}
+$("action").addEventListener("click",()=>{
+ if(!checked){
+  const q=questions[index];checked=true;
+  if(selected===q.c)score++;
+  document.querySelectorAll(".answer").forEach((el,i)=>{el.querySelector("input").disabled=true;if(i===q.c)el.style.borderColor="#299764";if(i===selected&&selected!==q.c)el.style.borderColor="#d88b35";});
+  $("feedback").innerHTML=`<div class="feedback"><div class="${selected===q.c?'good':'bad'}">${selected===q.c?'✓ Правильно! Молодец!':'Правильный ответ: '+String.fromCharCode(1040+q.c)}</div>${q.e}</div>`;
+  $("points").textContent=`Правильных ответов: ${score}`;
+  $("action").textContent=index===questions.length-1?"Посмотреть результат":"Следующий вопрос";
+ }else if(index<questions.length-1){index++;render();}
+ else{showResult();}
+});
+function showResult(){
+ const percent=Math.round(score/questions.length*100);
+ const title=score>=13?"Отлично!":score>=10?"Очень хорошо!":score>=7?"Хорошо!":"Есть над чем поработать!";
+ const note=score>=13?"Прекрасное знание признаков равенства треугольников!":score>=10?"Хороший результат! Продолжайте совершенствовать знания.":score>=7?"Повторите три признака и попробуйте ещё раз.":"Рекомендуем повторить теорию и пройти викторину снова.";
+ $("quiz").innerHTML=`<div class="result"><div class="trophy">🏆</div><h2>Викторина завершена!</h2><div class="score">${score} / 15</div><h2>${title}</h2><p>${note}</p><p class="small">Ваш результат: ${percent}% правильных ответов.</p><button onclick="location.reload()">↻ Пройти ещё раз</button></div>`;
+}
+render();
+</script>
+</body>
+</html>
